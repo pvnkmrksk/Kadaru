@@ -1,6 +1,6 @@
-# Image Scrambler
+# Kadaru ಕದರು
 
-A web-based tool for scrambling images while preserving local texture and destroying global structure. Features block-based and column-based shuffling with customizable parameters.
+**Kadaru** (ಕದರು) means "mix" or "scramble" in Kannada. This web application scrambles images while preserving local texture and destroying global structure.
 
 ## 🌟 Features
 
@@ -19,46 +19,35 @@ A web-based tool for scrambling images while preserving local texture and destro
 - PNG download of scrambled images
 - Maintains original image dimensions and quality
 - Responsive design for mobile and desktop
+- Beautiful, modern UI with gradient backgrounds
 
 ## 🚀 GitHub Pages Deployment
 
-### Option 1: Direct Upload (Easiest)
+This project is ready to be deployed as a static GitHub Pages site. Follow these steps:
 
-1. Create a new GitHub repository
-2. Go to repository Settings → Pages
-3. Under "Source", select "Deploy from a branch"
-4. Select branch: `main` and folder: `/ (root)`
-5. Upload `index.html` to the root of your repository
-6. Your site will be available at: `https://your-username.github.io/your-repo-name/`
+### Quick Setup
 
-### Option 2: Using Git
+1. **Create a new GitHub repository** (or use an existing one)
+2. **Push the files** to your repository:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit: Kadaru image scrambler"
+   git branch -M main
+   git remote add origin https://github.com/your-username/kadaru.git
+   git push -u origin main
+   ```
 
-```bash
-# Create a new repository on GitHub first, then:
+3. **Enable GitHub Pages**:
+   - Go to your repository on GitHub
+   - Navigate to **Settings** → **Pages**
+   - Under "Source", select **"Deploy from a branch"**
+   - Select branch: `main` and folder: `/ (root)`
+   - Click **Save**
 
-# Initialize local repository
-git init
-git add index.html
-git commit -m "Initial commit: Image Scrambler"
+4. **Your site will be live at**: `https://your-username.github.io/kadaru/`
 
-# Add remote and push
-git remote add origin https://github.com/your-username/your-repo-name.git
-git branch -M main
-git push -u origin main
-
-# Enable GitHub Pages
-# Go to Settings → Pages → Source: main branch
-```
-
-### Option 3: Using GitHub's Web Interface
-
-1. Create a new repository on GitHub
-2. Click "Upload files"
-3. Drag and drop `index.html`
-4. Commit changes
-5. Go to Settings → Pages
-6. Select `main` branch as source
-7. Wait a few minutes for deployment
+The `.nojekyll` file is included to ensure GitHub Pages serves the site correctly without Jekyll processing.
 
 ## 📖 How It Works
 
@@ -97,6 +86,7 @@ This ensures:
 - **Canvas API**: Direct pixel manipulation
 - **Client-side Processing**: All processing happens in browser
 - **File Size**: Single HTML file (~15KB)
+- **No Build Process**: Just upload and deploy!
 
 ## 📱 Browser Support
 
@@ -128,18 +118,6 @@ Works on all modern browsers:
 - **25-50%**: Subtle edge blending
 - **75-100%**: Heavy blending, smooth transitions
 
-## 📄 License
-
-Free to use and modify. No attribution required.
-
-## 🤝 Contributing
-
-This is a single-file application. To modify:
-1. Open `index.html` in a text editor
-2. Make your changes
-3. Test by opening in a browser
-4. Deploy to GitHub Pages
-
 ## 💡 Tips
 
 1. **Start with default settings** and adjust from there
@@ -154,6 +132,18 @@ This is a single-file application. To modify:
 - Smoothing with large radius is computationally intensive
 - Mobile browsers may have reduced performance
 
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+This is a single-file application. To modify:
+1. Open `index.html` in a text editor
+2. Make your changes
+3. Test by opening in a browser
+4. Deploy to GitHub Pages
+
 ## 📞 Support
 
 For issues or questions:
@@ -163,4 +153,4 @@ For issues or questions:
 
 ---
 
-Made with ❤️ using vanilla JavaScript
+Made with ❤️ by [@pvnkmrksk](https://github.com/pvnkmrksk)
