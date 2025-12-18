@@ -217,12 +217,20 @@
             font-weight: 600;
         }
 
+        .canvas-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
         canvas {
             max-width: 100%;
+            width: auto;
+            height: auto;
             border: 1px solid var(--border);
             border-radius: 6px;
             display: block;
-            margin: 0 auto;
             background: #f9fafb;
         }
 
@@ -358,13 +366,17 @@
         <div class="image-container" id="imageContainer">
             <div class="image-panel">
                 <h3>Original</h3>
-                <canvas id="originalCanvas"></canvas>
+                <div class="canvas-wrapper">
+                    <canvas id="originalCanvas"></canvas>
+                </div>
                 <div class="stats" id="originalStats"></div>
             </div>
             
             <div class="image-panel">
                 <h3>Scrambled</h3>
-                <canvas id="scrambledCanvas"></canvas>
+                <div class="canvas-wrapper">
+                    <canvas id="scrambledCanvas"></canvas>
+                </div>
                 <div class="stats" id="scrambledStats"></div>
                 <button class="download-btn" onclick="downloadImage()">📥 Download PNG</button>
             </div>
@@ -452,18 +464,22 @@
             const originalCanvas = document.getElementById('originalCanvas');
             const scrambledCanvas = document.getElementById('scrambledCanvas');
             
-            // Calculate display size (max 600px width)
+            // Calculate display size (max 600px width) maintaining aspect ratio
             const maxWidth = 600;
-            const ratio = Math.min(maxWidth / img.width, maxWidth / img.height, 1);
+            const ratio = Math.min(maxWidth / img.width, 1);
             const displayWidth = Math.floor(img.width * ratio);
             const displayHeight = Math.floor(img.height * ratio);
 
-            // Set canvas sizes
+            // Set canvas sizes - actual canvas dimensions match image
             [originalCanvas, scrambledCanvas].forEach(canvas => {
+                // Set actual canvas resolution to match image (for drawing)
                 canvas.width = img.width;
                 canvas.height = img.height;
+                // Set display size maintaining exact aspect ratio
+                // Calculate height based on width to ensure no squishing
+                const aspectRatio = img.height / img.width;
                 canvas.style.width = displayWidth + 'px';
-                canvas.style.height = displayHeight + 'px';
+                canvas.style.height = (displayWidth * aspectRatio) + 'px';
             });
 
             // Draw original image
