@@ -116,6 +116,32 @@
             color: var(--text-primary);
         }
 
+        .examples {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .example-item {
+            text-align: center;
+        }
+
+        .example-item img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .example-item p {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
         .footer {
             text-align: center;
             margin-top: 48px;
@@ -147,6 +173,11 @@
             .logo {
                 width: 300px;
             }
+
+            .examples {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
         }
     </style>
 </head>
@@ -163,6 +194,20 @@
 
         <div class="content">
             <p><strong>Kadaru</strong> (ಕದರು) means "mix" or "scramble" in Kannada. This tool scrambles images while preserving local texture and destroying global structure.</p>
+
+            <h2>Examples</h2>
+            <p>Here's the Kadaru logo scrambled in two different modes:</p>
+            
+            <div class="examples">
+                <div class="example-item">
+                    <img src="kadaru_block.png" alt="Block Mode Example">
+                    <p><strong>Block Mode</strong><br>64px blocks</p>
+                </div>
+                <div class="example-item">
+                    <img src="kadaru_col.png" alt="Column Mode Example">
+                    <p><strong>Column Mode</strong><br>10 columns</p>
+                </div>
+            </div>
 
             <h2>How It Works</h2>
             <p>Kadaru uses two scrambling modes:</p>
