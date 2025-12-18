@@ -2,6 +2,8 @@
 
 **Kadaru** (ಕದರು) means "mix" or "scramble" in Kannada. This web application scrambles images while preserving local texture and destroying global structure.
 
+🌐 **Live Site**: [https://pvnkmrksk.github.io/Kadaru/](https://pvnkmrksk.github.io/Kadaru/)
+
 ## 🌟 Features
 
 ### Scrambling Modes
@@ -11,7 +13,6 @@
 ### Customizable Parameters
 - **Block Size / Column Count**: Control the granularity of scrambling
 - **Max Block Distance**: Constrain how far blocks/columns can move (preserves some spatial locality)
-- **Smoothing**: Cross-fade edges to eliminate harsh boundaries (Block mode only)
 - **Seeded Random**: Consistent scrambling for the same image
 
 ### Additional Features
@@ -19,35 +20,7 @@
 - PNG download of scrambled images
 - Maintains original image dimensions and quality
 - Responsive design for mobile and desktop
-- Beautiful, modern UI with gradient backgrounds
-
-## 🚀 GitHub Pages Deployment
-
-This project is ready to be deployed as a static GitHub Pages site. Follow these steps:
-
-### Quick Setup
-
-1. **Create a new GitHub repository** (or use an existing one)
-2. **Push the files** to your repository:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: Kadaru image scrambler"
-   git branch -M main
-   git remote add origin https://github.com/your-username/kadaru.git
-   git push -u origin main
-   ```
-
-3. **Enable GitHub Pages**:
-   - Go to your repository on GitHub
-   - Navigate to **Settings** → **Pages**
-   - Under "Source", select **"Deploy from a branch"**
-   - Select branch: `main` and folder: `/ (root)`
-   - Click **Save**
-
-4. **Your site will be live at**: `https://your-username.github.io/kadaru/`
-
-The `.nojekyll` file is included to ensure GitHub Pages serves the site correctly without Jekyll processing.
+- Beautiful, modern UI
 
 ## 📖 How It Works
 
@@ -55,7 +28,6 @@ The `.nojekyll` file is included to ensure GitHub Pages serves the site correctl
 - Divides image into a grid of square blocks
 - Shuffles blocks using a seeded random number generator
 - Optional distance constraint limits block movement
-- Optional smoothing blends block edges
 
 ### Column Mode
 - Divides image into N vertical strips
@@ -85,7 +57,7 @@ This ensures:
 - **Pure JavaScript**: No external dependencies
 - **Canvas API**: Direct pixel manipulation
 - **Client-side Processing**: All processing happens in browser
-- **File Size**: Single HTML file (~15KB)
+- **File Size**: Single HTML file
 - **No Build Process**: Just upload and deploy!
 
 ## 📱 Browser Support
@@ -99,9 +71,9 @@ Works on all modern browsers:
 ## 🎯 Parameters Guide
 
 ### Block Size (Block Mode)
-- **Small (1-10px)**: Fine-grained scrambling, abstract result
-- **Medium (10-50px)**: Balanced, recognizable elements scrambled
-- **Large (50px+)**: Coarse shuffling, maintains larger features
+- **Small (1-30px)**: Fine-grained scrambling, abstract result
+- **Medium (30-100px)**: Balanced, recognizable elements scrambled
+- **Large (100px+)**: Coarse shuffling, maintains larger features
 
 ### Column Count (Column Mode)
 - **Few (2-10)**: Large vertical strips, minimal scrambling
@@ -109,27 +81,20 @@ Works on all modern browsers:
 - **Many (30+)**: Fine vertical strips, heavily scrambled
 
 ### Max Block Distance
-- **0% (Unlimited)**: Complete random shuffling
-- **25-50%**: Moderate constraint, regional scrambling
-- **75-100%**: Strong constraint, mostly local shuffling
-
-### Smoothing (Block Mode)
-- **0%**: Sharp block boundaries (fastest)
-- **25-50%**: Subtle edge blending
-- **75-100%**: Heavy blending, smooth transitions
+- **0%**: Strong constraint, mostly local shuffling
+- **25-75%**: Moderate constraint, regional scrambling
+- **100% (Unlimited)**: Complete random shuffling
 
 ## 💡 Tips
 
 1. **Start with default settings** and adjust from there
 2. **Large images** (>2000px) may be slow to process
-3. **Smoothing** significantly increases processing time
-4. **Column mode** is faster than block mode for most images
-5. Use **distance constraints** to preserve some spatial structure
+3. **Column mode** is faster than block mode for most images
+4. Use **distance constraints** to preserve some spatial structure
 
 ## 🐛 Known Limitations
 
 - Very large images (>4000px) may cause slowdown
-- Smoothing with large radius is computationally intensive
 - Mobile browsers may have reduced performance
 
 ## 📄 License
@@ -142,7 +107,6 @@ This is a single-file application. To modify:
 1. Open `index.html` in a text editor
 2. Make your changes
 3. Test by opening in a browser
-4. Deploy to GitHub Pages
 
 ## 📞 Support
 
