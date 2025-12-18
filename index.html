@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kadaru - Image Scrambler</title>
+    <link rel="icon" type="image/png" href="kadaru.png">
     <style>
         * {
             margin: 0;
@@ -33,6 +34,17 @@
             margin: 0 auto;
             background: var(--bg);
             padding: 48px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 400px;
+            max-width: 100%;
+            height: auto;
         }
 
         h1 {
@@ -262,13 +274,89 @@
         .footer a {
             color: var(--primary);
             text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
+            font-weight: 500;
         }
 
         .footer a:hover {
-            color: var(--secondary);
             text-decoration: underline;
+        }
+
+        .about-link {
+            margin-left: 12px;
+            cursor: pointer;
+        }
+
+        /* About Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--bg);
+            margin: 5% auto;
+            padding: 32px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .close {
+            color: var(--text-secondary);
+            font-size: 28px;
+            font-weight: 300;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+
+        .modal-body h3 {
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .modal-body p {
+            margin-bottom: 16px;
+        }
+
+        .modal-body ul {
+            margin-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
         }
 
         @media (max-width: 768px) {
@@ -278,6 +366,10 @@
 
             h1 {
                 font-size: 2em;
+            }
+
+            .logo {
+                width: 250px;
             }
 
             .image-container {
@@ -298,7 +390,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎨 Kadaru <span class="kannada">ಕದರು</span></h1>
+        <div class="logo-container">
+            <img src="kadaru.png" alt="Kadaru" class="logo">
+        </div>
+        <h1>Kadaru <span class="kannada">ಕದರು</span></h1>
         <p class="subtitle">Mix and scramble your images while preserving local texture</p>
         
         <div class="upload-section">
@@ -329,8 +424,8 @@
             </div>
 
             <div class="control-group">
-                <label>Max Block Distance: <span id="maxDistanceValue">Unlimited</span></label>
-                <input type="range" class="slider" id="maxDistance" min="0" max="100" value="100">
+                <label>Max Scramble Distance: <span id="maxDistanceValue">50%</span></label>
+                <input type="range" class="slider" id="maxDistance" min="0" max="100" value="50">
             </div>
         </div>
 
@@ -355,6 +450,57 @@
 
         <div class="footer">
             Made with ❤️ by <a href="https://github.com/pvnkmrksk" target="_blank" rel="noopener noreferrer">@pvnkmrksk</a>
+            <span class="about-link" onclick="openAbout()">About</span>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About Kadaru</h2>
+                <span class="close" onclick="closeAbout()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p><strong>Kadaru</strong> (ಕದರು) means "mix" or "scramble" in Kannada. This tool scrambles images while preserving local texture and destroying global structure.</p>
+
+                <h3>How It Works</h3>
+                <p>Kadaru uses two scrambling modes:</p>
+                
+                <h3>Block Mode</h3>
+                <ul>
+                    <li>Divides your image into a grid of square blocks</li>
+                    <li>Shuffles the blocks using a seeded random number generator</li>
+                    <li>Block size controls how fine or coarse the scrambling is</li>
+                    <li>Max scramble distance limits how far blocks can move from their original position</li>
+                </ul>
+
+                <h3>Column Mode</h3>
+                <ul>
+                    <li>Divides your image into vertical strips (columns)</li>
+                    <li>Shuffles columns left and right</li>
+                    <li>Column count determines how many strips to create</li>
+                    <li>Preserves vertical coherence within each strip</li>
+                </ul>
+
+                <h3>Seeded Randomization</h3>
+                <p>The scrambler uses a seed derived from your image's dimensions and pixel values. This ensures:</p>
+                <ul>
+                    <li>The same image always produces the same scrambling pattern</li>
+                    <li>Different images produce different scrambling patterns</li>
+                    <li>Results are reproducible</li>
+                </ul>
+
+                <h3>Max Scramble Distance</h3>
+                <p>This parameter controls how far blocks or columns can move from their original position:</p>
+                <ul>
+                    <li><strong>0%</strong>: Blocks stay very close to their original position (minimal scrambling)</li>
+                    <li><strong>50%</strong>: Moderate scrambling with some spatial locality preserved</li>
+                    <li><strong>100% (Unlimited)</strong>: Complete random shuffling with no distance constraints</li>
+                </ul>
+
+                <p>All processing happens in your browser - your images never leave your device.</p>
+            </div>
         </div>
     </div>
 
@@ -396,7 +542,7 @@
                 if (id === 'blockSize' || id === 'columnCount') {
                     valueDisplay.textContent = value + (id === 'blockSize' ? 'px' : '');
                 } else if (id === 'maxDistance') {
-                    // Inverted: 100 = Unlimited, 0 = 0%
+                    // 100 = Unlimited, 0-99 = percentage
                     valueDisplay.textContent = value == 100 ? 'Unlimited' : value + '%';
                 }
             });
@@ -692,6 +838,22 @@
             link.download = 'scrambled-image.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
+        }
+
+        function openAbout() {
+            document.getElementById('aboutModal').style.display = 'block';
+        }
+
+        function closeAbout() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('aboutModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
         }
     </script>
 </body>
