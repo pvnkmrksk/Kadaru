@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Scrambler - Block & Column Shuffler</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .value-display {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 5px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .mode-btn:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+
+        .image-container {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .image-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-panel h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #555;
+            font-size: 1.2em;
+        }
+
+        canvas {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .stats {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .processing {
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .download-btn {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .image-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Image Scrambler</h1>
+        <p class="subtitle">Preserve local texture while destroying global structure</p>
+        
+        <div class="upload-section">
+            <input type="file" id="imageInput" class="file-input" accept="image/*">
+            <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                📁 Choose Image
+            </button>
+            <p style="margin-top: 10px; color: #666;">Upload an image to start scrambling!</p>
+        </div>
+
+        <div class="controls" id="controls">
+            <div class="control-group">
+                <label>Scrambling Mode</label>
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="block">Block</button>
+                    <button class="mode-btn" data-mode="column">Column</button>
+                </div>
+            </div>
+
+            <div class="control-group" id="blockSizeControl">
+                <label>Block Size: <span id="blockSizeValue">16px</span></label>
+                <input type="range" class="slider" id="blockSize" min="1" max="200" value="16">
+            </div>
+
+            <div class="control-group" id="columnCountControl" style="display: none;">
+                <label>Number of Columns: <span id="columnCountValue">10</span></label>
+                <input type="range" class="slider" id="columnCount" min="2" max="100" value="10">
+            </div>
+
+            <div class="control-group">
+                <label>Max Block Distance: <span id="maxDistanceValue">Unlimited</span></label>
+                <input type="range" class="slider" id="maxDistance" min="0" max="100" value="0">
+            </div>
+
+            <div class="control-group">
+                <label>Smoothing: <span id="smoothingValue">0%</span></label>
+                <input type="range" class="slider" id="smoothing" min="0" max="100" value="0">
+            </div>
+        </div>
+
+        <div class="image-container" id="imageContainer">
+            <div class="image-panel">
+                <h3>Original</h3>
+                <canvas id="originalCanvas"></canvas>
+                <div class="stats" id="originalStats"></div>
+            </div>
+            
+            <div class="image-panel">
+                <h3>Scrambled</h3>
+                <canvas id="scrambledCanvas"></canvas>
+                <div class="stats" id="scrambledStats"></div>
+                <button class="download-btn" onclick="downloadImage()">📥 Download PNG</button>
+            </div>
+        </div>
+
+        <div class="processing" id="processing" style="display: none;">
+            Processing... ⚡
+        </div>
+    </div>
+
+    <script>
+        let originalImageData = null;
+        let currentMode = 'block';
+        let originalImage = null;
+
+        // Event listeners
+        document.getElementById('imageInput').addEventListener('change', handleImageUpload);
+        
+        // Mode selector
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentMode = e.target.dataset.mode;
+                
+                // Show/hide appropriate controls
+                document.getElementById('blockSizeControl').style.display = 
+                    currentMode === 'block' ? 'flex' : 'none';
+                document.getElementById('columnCountControl').style.display = 
+                    currentMode === 'column' ? 'flex' : 'none';
+                
+                if (originalImageData) {
+                    scrambleImage();
+                }
+            });
+        });
+
+        // Slider event listeners with debouncing
+        const sliders = ['blockSize', 'columnCount', 'maxDistance', 'smoothing'];
+        sliders.forEach(id => {
+            const slider = document.getElementById(id);
+            const valueDisplay = document.getElementById(id + 'Value');
+            
+            slider.addEventListener('input', (e) => {
+                let value = e.target.value;
+                if (id === 'blockSize' || id === 'columnCount') {
+                    valueDisplay.textContent = value + (id === 'blockSize' ? 'px' : '');
+                } else if (id === 'maxDistance') {
+                    valueDisplay.textContent = value == 0 ? 'Unlimited' : value + '%';
+                } else if (id === 'smoothing') {
+                    valueDisplay.textContent = value + '%';
+                }
+            });
+            
+            slider.addEventListener('change', () => {
+                if (originalImageData) {
+                    scrambleImage();
+                }
+            });
+        });
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    setupCanvases(img);
+                    document.getElementById('controls').style.display = 'grid';
+                    document.getElementById('imageContainer').style.display = 'grid';
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setupCanvases(img) {
+            const originalCanvas = document.getElementById('originalCanvas');
+            const scrambledCanvas = document.getElementById('scrambledCanvas');
+            
+            // Calculate display size (max 600px width)
+            const maxWidth = 600;
+            const ratio = Math.min(maxWidth / img.width, maxWidth / img.height, 1);
+            const displayWidth = Math.floor(img.width * ratio);
+            const displayHeight = Math.floor(img.height * ratio);
+
+            // Set canvas sizes
+            [originalCanvas, scrambledCanvas].forEach(canvas => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                canvas.style.width = displayWidth + 'px';
+                canvas.style.height = displayHeight + 'px';
+            });
+
+            // Draw original image
+            const originalCtx = originalCanvas.getContext('2d');
+            originalCtx.drawImage(img, 0, 0);
+            
+            // Store original image data
+            originalImageData = originalCtx.getImageData(0, 0, img.width, img.height);
+            
+            // Update stats
+            document.getElementById('originalStats').innerHTML = `
+                Dimensions: ${img.width} × ${img.height}<br>
+                Total pixels: ${(img.width * img.height).toLocaleString()}
+            `;
+
+            // Update slider max values based on image dimensions
+            const maxBlockSize = Math.floor(Math.min(img.width, img.height) * 0.5);
+            document.getElementById('blockSize').max = maxBlockSize;
+            
+            const maxColumns = Math.min(img.width, 100);
+            document.getElementById('columnCount').max = maxColumns;
+
+            // Initial scramble
+            scrambleImage();
+        }
+
+        function scrambleImage() {
+            if (!originalImageData) return;
+
+            document.getElementById('processing').style.display = 'block';
+
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                const scrambledData = new ImageData(
+                    new Uint8ClampedArray(originalImageData.data),
+                    originalImageData.width,
+                    originalImageData.height
+                );
+
+                if (currentMode === 'block') {
+                    const blockSize = parseInt(document.getElementById('blockSize').value);
+                    const maxDistancePercent = parseInt(document.getElementById('maxDistance').value);
+                    const smoothingPercent = parseInt(document.getElementById('smoothing').value);
+                    blockScramble(scrambledData, blockSize, maxDistancePercent, smoothingPercent);
+                } else if (currentMode === 'column') {
+                    const columnCount = parseInt(document.getElementById('columnCount').value);
+                    const maxDistancePercent = parseInt(document.getElementById('maxDistance').value);
+                    columnScramble(scrambledData, columnCount, maxDistancePercent);
+                }
+
+                // Draw scrambled image
+                const scrambledCanvas = document.getElementById('scrambledCanvas');
+                const scrambledCtx = scrambledCanvas.getContext('2d');
+                scrambledCtx.putImageData(scrambledData, 0, 0);
+
+                // Update stats
+                document.getElementById('scrambledStats').innerHTML = `
+                    Mode: ${currentMode === 'block' ? 'Block Shuffle' : 'Column Shuffle'}<br>
+                    ${currentMode === 'block' ? 'Block Size: ' + document.getElementById('blockSize').value + 'px' : 'Columns: ' + document.getElementById('columnCount').value}
+                `;
+
+                document.getElementById('processing').style.display = 'none';
+            }, 10);
+        }
+
+        function seededRandom(seed) {
+            let state = seed;
+            return function() {
+                state = (state * 1664525 + 1013904223) % 4294967296;
+                return state / 4294967296;
+            };
+        }
+
+        function blockScramble(imageData, blockSize, maxDistancePercent, smoothingPercent) {
+            const { width, height, data } = imageData;
+            
+            // Create seed from image properties
+            let seed = width * height;
+            for (let i = 0; i < Math.min(100, data.length); i += 4) {
+                seed += data[i] + data[i+1] + data[i+2];
+            }
+            const rng = seededRandom(seed);
+
+            // Calculate blocks
+            const blocksX = Math.ceil(width / blockSize);
+            const blocksY = Math.ceil(height / blockSize);
+            const blocks = [];
+
+            for (let by = 0; by < blocksY; by++) {
+                for (let bx = 0; bx < blocksX; bx++) {
+                    const x = bx * blockSize;
+                    const y = by * blockSize;
+                    const w = Math.min(blockSize, width - x);
+                    const h = Math.min(blockSize, height - y);
+                    blocks.push({
+                        x, y, w, h,
+                        centerX: x + w / 2,
+                        centerY: y + h / 2
+                    });
+                }
+            }
+
+            // Create shuffle order
+            const scrambledOrder = blocks.map((_, i) => i);
+            
+            // Calculate max distance in pixels
+            const maxDiagonal = Math.sqrt(width * width + height * height);
+            const maxDistance = maxDistancePercent === 0 ? Infinity : (maxDistancePercent / 100) * maxDiagonal;
+
+            // Shuffle with distance constraint
+            for (let i = scrambledOrder.length - 1; i > 0; i--) {
+                let validTargets = [];
+                
+                if (maxDistance !== Infinity) {
+                    for (let j = 0; j <= i; j++) {
+                        const sourceBlock = blocks[scrambledOrder[i]];
+                        const targetBlock = blocks[scrambledOrder[j]];
+                        const distance = Math.sqrt(
+                            Math.pow(sourceBlock.centerX - targetBlock.centerX, 2) +
+                            Math.pow(sourceBlock.centerY - targetBlock.centerY, 2)
+                        );
+                        if (distance <= maxDistance) {
+                            validTargets.push(j);
+                        }
+                    }
+                } else {
+                    validTargets = Array.from({length: i + 1}, (_, idx) => idx);
+                }
+                
+                if (validTargets.length > 0) {
+                    const j = validTargets[Math.floor(rng() * validTargets.length)];
+                    [scrambledOrder[i], scrambledOrder[j]] = [scrambledOrder[j], scrambledOrder[i]];
+                }
+            }
+
+            // Copy original data
+            const originalData = new Uint8ClampedArray(data);
+
+            // Apply scrambling
+            for (let i = 0; i < blocks.length; i++) {
+                const sourceBlock = blocks[i];
+                const targetBlock = blocks[scrambledOrder[i]];
+                
+                if (i !== scrambledOrder[i]) {
+                    copyBlock(data, originalData, width, sourceBlock, targetBlock);
+                }
+            }
+
+            // Apply smoothing
+            if (smoothingPercent > 0) {
+                const smoothingRadius = Math.floor((smoothingPercent / 100) * blockSize);
+                applyBlockSmoothing(imageData, blocks, smoothingRadius, scrambledOrder);
+            }
+        }
+
+        function columnScramble(imageData, columnCount, maxDistancePercent) {
+            const { width, height, data } = imageData;
+            
+            // Create seed from image properties
+            let seed = width * height;
+            for (let i = 0; i < Math.min(100, data.length); i += 4) {
+                seed += data[i] + data[i+1] + data[i+2];
+            }
+            const rng = seededRandom(seed);
+
+            // Calculate column width
+            const columnWidth = Math.floor(width / columnCount);
+            const columns = [];
+
+            // Define columns
+            for (let i = 0; i < columnCount; i++) {
+                const x = i * columnWidth;
+                const w = (i === columnCount - 1) ? (width - x) : columnWidth;
+                columns.push({
+                    x, y: 0,
+                    w, h: height,
+                    centerX: x + w / 2,
+                    centerY: height / 2,
+                    index: i
+                });
+            }
+
+            // Create shuffle order
+            const scrambledOrder = columns.map((_, i) => i);
+            
+            // Calculate max distance
+            const maxDistance = maxDistancePercent === 0 ? Infinity : (maxDistancePercent / 100) * width;
+
+            // Shuffle with distance constraint
+            for (let i = scrambledOrder.length - 1; i > 0; i--) {
+                let validTargets = [];
+                
+                if (maxDistance !== Infinity) {
+                    for (let j = 0; j <= i; j++) {
+                        const sourceCol = columns[scrambledOrder[i]];
+                        const targetCol = columns[scrambledOrder[j]];
+                        const distance = Math.abs(sourceCol.centerX - targetCol.centerX);
+                        if (distance <= maxDistance) {
+                            validTargets.push(j);
+                        }
+                    }
+                } else {
+                    validTargets = Array.from({length: i + 1}, (_, idx) => idx);
+                }
+                
+                if (validTargets.length > 0) {
+                    const j = validTargets[Math.floor(rng() * validTargets.length)];
+                    [scrambledOrder[i], scrambledOrder[j]] = [scrambledOrder[j], scrambledOrder[i]];
+                }
+            }
+
+            // Copy original data
+            const originalData = new Uint8ClampedArray(data);
+
+            // Apply column shuffling
+            for (let i = 0; i < columns.length; i++) {
+                const sourceCol = columns[i];
+                const targetCol = columns[scrambledOrder[i]];
+                
+                if (i !== scrambledOrder[i]) {
+                    copyBlock(data, originalData, width, sourceCol, targetCol);
+                }
+            }
+        }
+
+        function copyBlock(destData, srcData, width, sourceBlock, targetBlock) {
+            const copyWidth = Math.min(sourceBlock.w, targetBlock.w);
+            const copyHeight = Math.min(sourceBlock.h, targetBlock.h);
+
+            for (let dy = 0; dy < copyHeight; dy++) {
+                for (let dx = 0; dx < copyWidth; dx++) {
+                    const srcX = sourceBlock.x + dx;
+                    const srcY = sourceBlock.y + dy;
+                    const dstX = targetBlock.x + dx;
+                    const dstY = targetBlock.y + dy;
+
+                    const srcIdx = (srcY * width + srcX) * 4;
+                    const dstIdx = (dstY * width + dstX) * 4;
+
+                    destData[dstIdx] = srcData[srcIdx];
+                    destData[dstIdx + 1] = srcData[srcIdx + 1];
+                    destData[dstIdx + 2] = srcData[srcIdx + 2];
+                    destData[dstIdx + 3] = srcData[srcIdx + 3];
+                }
+            }
+        }
+
+        function applyBlockSmoothing(imageData, blocks, radius, scrambledOrder) {
+            if (radius === 0) return;
+
+            const { width, height, data } = imageData;
+            const originalData = new Uint8ClampedArray(data);
+
+            for (let i = 0; i < blocks.length; i++) {
+                const block = blocks[scrambledOrder[i]];
+                
+                // Smooth edges of block
+                smoothBlockEdges(data, originalData, width, height, block, radius);
+            }
+        }
+
+        function smoothBlockEdges(data, originalData, width, height, block, radius) {
+            const { x, y, w, h } = block;
+
+            // Smooth all four edges
+            for (let edge of ['top', 'bottom', 'left', 'right']) {
+                let startX, endX, startY, endY;
+
+                if (edge === 'top' || edge === 'bottom') {
+                    startX = Math.max(0, x);
+                    endX = Math.min(width, x + w);
+                    startY = edge === 'top' ? Math.max(0, y - radius) : Math.max(0, y + h);
+                    endY = edge === 'top' ? Math.min(height, y + radius) : Math.min(height, y + h + radius);
+                } else {
+                    startY = Math.max(0, y);
+                    endY = Math.min(height, y + h);
+                    startX = edge === 'left' ? Math.max(0, x - radius) : Math.max(0, x + w);
+                    endX = edge === 'left' ? Math.min(width, x + radius) : Math.min(width, x + w + radius);
+                }
+
+                for (let py = startY; py < endY; py++) {
+                    for (let px = startX; px < endX; px++) {
+                        let distance;
+                        if (edge === 'top') distance = Math.abs(py - y);
+                        else if (edge === 'bottom') distance = Math.abs(py - (y + h));
+                        else if (edge === 'left') distance = Math.abs(px - x);
+                        else distance = Math.abs(px - (x + w));
+
+                        const alpha = 1 - (distance / radius);
+                        if (alpha > 0) {
+                            const idx = (py * width + px) * 4;
+                            for (let c = 0; c < 3; c++) {
+                                data[idx + c] = Math.round(
+                                    data[idx + c] * alpha + originalData[idx + c] * (1 - alpha)
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function downloadImage() {
+            const canvas = document.getElementById('scrambledCanvas');
+            const link = document.createElement('a');
+            link.download = 'scrambled-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
