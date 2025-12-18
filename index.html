@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kadaru - Image Scrambler</title>
     <link rel="icon" type="image/png" href="kadaru.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kadaru">
+    <link rel="apple-touch-icon" href="kadaru.png">
     <style>
         * {
             margin: 0;
@@ -280,17 +286,53 @@
         }
 
         .footer a {
-            color: var(--primary);
+            color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
         }
 
         .footer a:hover {
+            color: var(--text-primary);
             text-decoration: underline;
         }
 
         .about-link {
             margin-left: 12px;
+        }
+
+        /* Add to Home Screen Tip */
+        .install-tip {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.9em;
+            color: var(--text-primary);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 280px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .install-tip.show {
+            display: block;
+        }
+
+        .install-tip-close {
+            float: right;
+            margin-left: 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: bold;
+            font-size: 1.2em;
+            line-height: 1;
+        }
+
+        .install-tip-close:hover {
+            color: var(--text-primary);
         }
 
         @media (max-width: 768px) {
@@ -318,6 +360,13 @@
 
             .upload-section {
                 padding: 32px 24px;
+            }
+
+            .install-tip {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
             }
         }
     </style>
@@ -392,10 +441,63 @@
         </div>
     </div>
 
+    <!-- Add to Home Screen Tip -->
+    <div id="installTip" class="install-tip">
+        <span class="install-tip-close" onclick="dismissInstallTip()">&times;</span>
+        <strong>Add to Home Screen</strong><br>
+        Install Kadaru as an app for offline use. Tap the menu and select "Add to Home Screen".
+    </div>
+
     <script>
         let originalImageData = null;
         let currentMode = 'block';
         let originalImage = null;
+
+        // Load saved settings from localStorage
+        function loadSettings() {
+            const savedMode = localStorage.getItem('kadaru_mode');
+            const savedBlockSize = localStorage.getItem('kadaru_blockSize');
+            const savedColumnCount = localStorage.getItem('kadaru_columnCount');
+            const savedMaxDistance = localStorage.getItem('kadaru_maxDistance');
+
+            if (savedMode) {
+                currentMode = savedMode;
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mode === savedMode);
+                });
+                document.getElementById('blockSizeControl').style.display = 
+                    savedMode === 'block' ? 'flex' : 'none';
+                document.getElementById('columnCountControl').style.display = 
+                    savedMode === 'column' ? 'flex' : 'none';
+            }
+
+            if (savedBlockSize) {
+                document.getElementById('blockSize').value = savedBlockSize;
+                document.getElementById('blockSizeValue').textContent = savedBlockSize + 'px';
+            }
+
+            if (savedColumnCount) {
+                document.getElementById('columnCount').value = savedColumnCount;
+                document.getElementById('columnCountValue').textContent = savedColumnCount;
+            }
+
+            if (savedMaxDistance !== null) {
+                document.getElementById('maxDistance').value = savedMaxDistance;
+                document.getElementById('maxDistanceValue').textContent = 
+                    savedMaxDistance == 100 ? 'Unlimited' : savedMaxDistance + '%';
+            }
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            localStorage.setItem('kadaru_mode', currentMode);
+            localStorage.setItem('kadaru_blockSize', document.getElementById('blockSize').value);
+            localStorage.setItem('kadaru_columnCount', document.getElementById('columnCount').value);
+            localStorage.setItem('kadaru_maxDistance', document.getElementById('maxDistance').value);
+        }
+
+        // Load settings on page load
+        loadSettings();
 
         // Event listeners
         document.getElementById('imageInput').addEventListener('change', handleImageUpload);
@@ -406,6 +508,7 @@
                 document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 currentMode = e.target.dataset.mode;
+                saveSettings();
                 
                 // Show/hide appropriate controls
                 document.getElementById('blockSizeControl').style.display = 
@@ -436,6 +539,7 @@
             });
             
             slider.addEventListener('change', () => {
+                saveSettings();
                 if (originalImageData) {
                     scrambleImage();
                 }
@@ -730,6 +834,53 @@
             link.download = 'scrambled-image.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
+        }
+
+        // Install tip functionality
+        function showInstallTip() {
+            // Don't show if already dismissed or already installed
+            if (localStorage.getItem('kadaru_installTipDismissed') === 'true') return;
+            if (window.matchMedia('(display-mode: standalone)').matches) return;
+            
+            // Check if browser supports install prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                setTimeout(() => {
+                    document.getElementById('installTip').classList.add('show');
+                }, 3000); // Show after 3 seconds
+            });
+
+            // Also show on mobile devices after a delay
+            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                setTimeout(() => {
+                    if (!localStorage.getItem('kadaru_installTipDismissed')) {
+                        document.getElementById('installTip').classList.add('show');
+                    }
+                }, 5000);
+            }
+        }
+
+        function dismissInstallTip() {
+            document.getElementById('installTip').classList.remove('show');
+            localStorage.setItem('kadaru_installTipDismissed', 'true');
+        }
+
+        // Show install tip on load
+        showInstallTip();
+
+        // Register service worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
         }
     </script>
 </body>
