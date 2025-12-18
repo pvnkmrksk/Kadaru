@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Kadaru</title>
+    <link rel="icon" type="image/png" href="kadaru.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #d1d5db;
+            --bg: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: #f9fafb;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg);
+            padding: 48px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            width: 500px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-size: 3em;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .kannada {
+            font-size: 1em;
+            color: var(--text-secondary);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            font-size: 1.125em;
+            font-weight: 400;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 32px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            line-height: 1.8;
+        }
+
+        .content h2 {
+            margin-top: 32px;
+            margin-bottom: 16px;
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content h3 {
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content p {
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .content ul {
+            margin-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        .content li {
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 48px;
+            padding: 24px;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .logo {
+                width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Kadaru</a>
+        
+        <div class="logo-container">
+            <img src="kadaru.png" alt="Kadaru" class="logo">
+        </div>
+        
+        <h1>Kadaru <span class="kannada">ಕದರು</span></h1>
+        <p class="subtitle">Mix and scramble your images while preserving local texture</p>
+
+        <div class="content">
+            <p><strong>Kadaru</strong> (ಕದರು) means "mix" or "scramble" in Kannada. This tool scrambles images while preserving local texture and destroying global structure.</p>
+
+            <h2>How It Works</h2>
+            <p>Kadaru uses two scrambling modes:</p>
+            
+            <h3>Block Mode</h3>
+            <ul>
+                <li>Divides your image into a grid of square blocks</li>
+                <li>Shuffles the blocks using a seeded random number generator</li>
+                <li>Block size controls how fine or coarse the scrambling is</li>
+                <li>Max scramble distance limits how far blocks can move from their original position</li>
+            </ul>
+
+            <h3>Column Mode</h3>
+            <ul>
+                <li>Divides your image into vertical strips (columns)</li>
+                <li>Shuffles columns left and right</li>
+                <li>Column count determines how many strips to create</li>
+                <li>Preserves vertical coherence within each strip</li>
+            </ul>
+
+            <h2>Seeded Randomization</h2>
+            <p>The scrambler uses a seed derived from your image's dimensions and pixel values. This ensures:</p>
+            <ul>
+                <li>The same image always produces the same scrambling pattern</li>
+                <li>Different images produce different scrambling patterns</li>
+                <li>Results are reproducible</li>
+            </ul>
+
+            <h2>Max Scramble Distance</h2>
+            <p>This parameter controls how far blocks or columns can move from their original position:</p>
+            <ul>
+                <li><strong>0%</strong>: Blocks stay very close to their original position (minimal scrambling)</li>
+                <li><strong>50%</strong>: Moderate scrambling with some spatial locality preserved</li>
+                <li><strong>100% (Unlimited)</strong>: Complete random shuffling with no distance constraints</li>
+            </ul>
+
+            <h2>Privacy & Processing</h2>
+            <p>All processing happens in your browser - your images never leave your device. No data is sent to any server.</p>
+        </div>
+
+        <div class="footer">
+            Made with ❤️ by <a href="https://github.com/pvnkmrksk" target="_blank" rel="noopener noreferrer">@pvnkmrksk</a>
+        </div>
+    </div>
+</body>
+</html>
+
