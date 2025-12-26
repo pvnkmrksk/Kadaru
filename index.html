@@ -695,16 +695,24 @@
             // Calculate max distance in pixels
             // maxDistancePercent: 100 = Unlimited, 0-99 = percentage
             const maxDiagonal = Math.sqrt(width * width + height * height);
-            const maxDistance = maxDistancePercent === 100 ? Infinity : (maxDistancePercent / 100) * maxDiagonal;
+            // Ensure we handle both number and string comparisons
+            const maxDistance = (maxDistancePercent == 100 || maxDistancePercent === 100) ? Infinity : (maxDistancePercent / 100) * maxDiagonal;
 
             // Shuffle with distance constraint
+            // Use Fisher-Yates shuffle algorithm
             for (let i = scrambledOrder.length - 1; i > 0; i--) {
                 let validTargets = [];
                 
                 if (maxDistance !== Infinity) {
+                    // With distance constraint: check distance from original position
+                    // scrambledOrder[i] is the block index currently at position i
+                    const sourceBlockIndex = scrambledOrder[i];
+                    const sourceBlock = blocks[sourceBlockIndex];
+                    
                     for (let j = 0; j <= i; j++) {
-                        const sourceBlock = blocks[scrambledOrder[i]];
-                        const targetBlock = blocks[scrambledOrder[j]];
+                        // Check distance from source block's original position to target position's original block
+                        const targetBlockIndex = scrambledOrder[j];
+                        const targetBlock = blocks[targetBlockIndex];
                         const distance = Math.sqrt(
                             Math.pow(sourceBlock.centerX - targetBlock.centerX, 2) +
                             Math.pow(sourceBlock.centerY - targetBlock.centerY, 2)
@@ -714,9 +722,11 @@
                         }
                     }
                 } else {
+                    // Unlimited: can swap with any position from 0 to i (full Fisher-Yates)
                     validTargets = Array.from({length: i + 1}, (_, idx) => idx);
                 }
                 
+                // Always swap if we have valid targets (should always be true for unlimited)
                 if (validTargets.length > 0) {
                     const j = validTargets[Math.floor(rng() * validTargets.length)];
                     [scrambledOrder[i], scrambledOrder[j]] = [scrambledOrder[j], scrambledOrder[i]];
@@ -769,25 +779,35 @@
             
             // Calculate max distance
             // maxDistancePercent: 100 = Unlimited, 0-99 = percentage
-            const maxDistance = maxDistancePercent === 100 ? Infinity : (maxDistancePercent / 100) * width;
+            // Ensure we handle both number and string comparisons
+            const maxDistance = (maxDistancePercent == 100 || maxDistancePercent === 100) ? Infinity : (maxDistancePercent / 100) * width;
 
             // Shuffle with distance constraint
+            // Use Fisher-Yates shuffle algorithm
             for (let i = scrambledOrder.length - 1; i > 0; i--) {
                 let validTargets = [];
                 
                 if (maxDistance !== Infinity) {
+                    // With distance constraint: check distance from original position
+                    // scrambledOrder[i] is the column index currently at position i
+                    const sourceColIndex = scrambledOrder[i];
+                    const sourceCol = columns[sourceColIndex];
+                    
                     for (let j = 0; j <= i; j++) {
-                        const sourceCol = columns[scrambledOrder[i]];
-                        const targetCol = columns[scrambledOrder[j]];
+                        // Check distance from source column's original position to target position's original column
+                        const targetColIndex = scrambledOrder[j];
+                        const targetCol = columns[targetColIndex];
                         const distance = Math.abs(sourceCol.centerX - targetCol.centerX);
                         if (distance <= maxDistance) {
                             validTargets.push(j);
                         }
                     }
                 } else {
+                    // Unlimited: can swap with any position from 0 to i (full Fisher-Yates)
                     validTargets = Array.from({length: i + 1}, (_, idx) => idx);
                 }
                 
+                // Always swap if we have valid targets (should always be true for unlimited)
                 if (validTargets.length > 0) {
                     const j = validTargets[Math.floor(rng() * validTargets.length)];
                     [scrambledOrder[i], scrambledOrder[j]] = [scrambledOrder[j], scrambledOrder[i]];
